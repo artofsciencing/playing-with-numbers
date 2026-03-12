@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playing with Numbers — Class 8</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17;
+    --panel: #1a1830;
+    --card: #231f3a;
+    --accent1: #ff6b6b;
+    --accent2: #ffd93d;
+    --accent3: #6bcb77;
+    --accent4: #4d96ff;
+    --accent5: #c77dff;
+    --text: #fffffe;
+    --muted: #a7a9be;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* STARS BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 15%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 50%, rgba(255,255,255,0.2) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 50px 20px 30px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--accent4);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent1), var(--accent5));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  header p {
+    color: var(--muted);
+    margin-top: 10px;
+    font-size: 1.1rem;
+  }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 20px 30px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .nav-btn {
+    background: var(--card);
+    border: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 8px 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .nav-btn:hover, .nav-btn.active {
+    border-color: var(--accent4);
+    color: var(--accent4);
+    background: rgba(77,150,255,0.1);
+  }
+
+  /* SECTION WRAPPER */
+  .section {
+    display: none;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .section.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 24px;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    border-radius: 4px 0 0 4px;
+  }
+  .card.red::before   { background: var(--accent1); }
+  .card.yellow::before { background: var(--accent2); }
+  .card.green::before { background: var(--accent3); }
+  .card.blue::before  { background: var(--accent4); }
+  .card.purple::before { background: var(--accent5); }
+
+  .card h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.5rem;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card p, .card li {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 1rem;
+  }
+
+  /* FORMULA BOX */
+  .formula {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin: 14px 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent2);
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* HIGHLIGHT */
+  .hl { font-weight: 800; color: var(--text); }
+  .hl-r { color: var(--accent1); font-weight: 800; }
+  .hl-y { color: var(--accent2); font-weight: 800; }
+  .hl-g { color: var(--accent3); font-weight: 800; }
+  .hl-b { color: var(--accent4); font-weight: 800; }
+  .hl-p { color: var(--accent5); font-weight: 800; }
+
+  /* INTERACTIVE DEMOS */
+  .demo-box {
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 20px;
+  }
+
+  .demo-box h3 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    color: var(--accent3);
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  input[type="number"], input[type="text"] {
+    background: var(--panel);
+    border: 2px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 12px;
+    width: 120px;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus { border-color: var(--accent4); }
+
+  .btn {
+    background: linear-gradient(135deg, var(--accent4), var(--accent5));
+    color: #fff;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+
+  .btn:hover { transform: scale(1.04); opacity: 0.9; }
+  .btn:active { transform: scale(0.97); }
+
+  .result-box {
+    background: rgba(77,150,255,0.1);
+    border: 1px solid var(--accent4);
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.9;
+    display: none;
+  }
+
+  .result-box.show { display: block; }
+
+  /* DIVISIBILITY TABLE */
+  .div-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 0.95rem;
+  }
+
+  .div-table th {
+    background: rgba(255,255,255,0.08);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 800;
+    color: var(--accent2);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .div-table td {
+    padding: 10px 14px;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    line-height: 1.6;
+  }
+
+  .div-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+  /* NUMBER BLOCKS */
+  .num-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    margin: 16px 0;
+  }
+
+  .num-block {
+    background: var(--panel);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 1.8rem;
+    font-weight: 800;
+    font-family: 'Fredoka One', cursive;
+    min-width: 60px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .num-block.pop {
+    animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* CRYPTARITHMETIC PUZZLE */
+  .puzzle-grid {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2rem;
+    color: var(--text);
+    text-align: right;
+    line-height: 2;
+    background: rgba(0,0,0,0.3);
+    padding: 20px 30px;
+    border-radius: 12px;
+    display: inline-block;
+    margin: 10px auto;
+  }
+
+  .puzzle-line { border-top: 2px solid var(--muted); padding-top: 6px; }
+
+  .letter-input {
+    background: rgba(255,107,107,0.2);
+    border: 2px solid var(--accent1);
+    color: var(--accent1);
+    width: 50px;
+    font-size: 1.8rem;
+    font-family: 'Fredoka One', cursive;
+    text-align: center;
+    border-radius: 8px;
+    display: inline-block;
+    padding: 0 4px;
+  }
+
+  /* QUIZ */
+  .quiz-q {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .quiz-opt {
+    background: var(--panel);
+    border: 2px solid rgba(255,255,255,0.08);
+    color: var(--muted);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+  }
+
+  .quiz-opt:hover { border-color: var(--accent4); color: var(--accent4); }
+  .quiz-opt.correct { border-color: var(--accent3); background: rgba(107,203,119,0.15); color: var(--accent3); }
+  .quiz-opt.wrong   { border-color: var(--accent1); background: rgba(255,107,107,0.1);  color: var(--accent1); }
+
+  .quiz-feedback {
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .quiz-feedback.show-correct { display: block; background: rgba(107,203,119,0.15); color: var(--accent3); border: 1px solid var(--accent3); }
+  .quiz-feedback.show-wrong   { display: block; background: rgba(255,107,107,0.1);  color: var(--accent1); border: 1px solid var(--accent1); }
+
+  .score-display {
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3rem;
+    color: var(--accent2);
+    margin-bottom: 16px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    height: 8px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, var(--accent4), var(--accent5));
+    transition: width 0.5s ease;
+  }
+
+  /* SECTION HEADING */
+  .section-heading {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-size: 1rem;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 500px) {
+    .quiz-options { grid-template-columns: 1fr; }
+    .puzzle-grid  { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Class 8 Mathematics</div>
+  <h1>🔢 Playing with Numbers</h1>
+  <p>An interactive visual lesson — tap through the chapters!</p>
+</header>
+
+<nav class="nav">
+  <button class="nav-btn active" onclick="showSection('intro')">🏠 Intro</button>
+  <button class="nav-btn" onclick="showSection('general')">📝 General Form</button>
+  <button class="nav-btn" onclick="showSection('reversals')">🔄 Reversal Magic</button>
+  <button class="nav-btn" onclick="showSection('divisibility')">➗ Divisibility</button>
+  <button class="nav-btn" onclick="showSection('crypto')">🔐 Cryptarithmetic</button>
+  <button class="nav-btn" onclick="showSection('quiz')">🎯 Quiz</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════ INTRO -->
+<div class="section active" id="intro">
+  <div class="section-heading">🌟 Welcome!</div>
+  <p class="section-sub">This chapter teaches you the hidden patterns inside numbers. Let's explore!</p>
+
+  <div class="card blue">
+    <h2>📚 What You'll Learn</h2>
+    <p>In <strong>Playing with Numbers</strong>, you'll discover:</p>
+    <ul style="margin-top:10px; padding-left:20px; display:flex; flex-direction:column; gap:8px;">
+      <li>How to write any number in its <span class="hl-b">general form</span> (like 10a + b)</li>
+      <li>Why reversing a 2-digit number gives a difference divisible by <span class="hl-y">9</span></li>
+      <li>How to crack <span class="hl-p">cryptarithmetic puzzles</span> (letters replacing digits)</li>
+      <li>All the powerful <span class="hl-g">divisibility rules</span> for 2 through 11</li>
+    </ul>
+  </div>
+
+  <div class="card yellow">
+    <h2>🧠 Why Does This Matter?</h2>
+    <p>Understanding number structure is the foundation of algebra, coding, cryptography, and even magic tricks! Every pattern in this chapter comes from one powerful idea — numbers can be broken into their <span class="hl-y">place values</span>.</p>
+    <div class="formula">47 = 4 × 10 + 7 &nbsp;|&nbsp; 253 = 2 × 100 + 5 × 10 + 3</div>
+    <p>That's it. From this one idea, all the magic flows. Ready? Navigate with the buttons above! ☝️</p>
+  </div>
+
+  <div class="card green">
+    <h2>🗺️ Chapter Map</h2>
+    <p style="margin-bottom:8px;">This lesson has <strong>4 concept sections</strong> + a <strong>quiz</strong>. In each section you'll find:</p>
+    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:6px;">
+      <li>📖 Clear explanation with examples</li>
+      <li>⚡ Interactive demos to test your understanding</li>
+      <li>🎯 A quiz at the end to test yourself</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ GENERAL FORM -->
+<div class="section" id="general">
+  <div class="section-heading">📝 Numbers in General Form</div>
+  <p class="section-sub">Every number has a secret skeleton — its general form!</p>
+
+  <div class="card blue">
+    <h2>🔬 What is General Form?</h2>
+    <p>The <span class="hl-b">general form</span> expresses a number using its <strong>digits</strong> and <strong>place values</strong>.</p>
+    <div class="formula">2-digit number <span style="color:var(--text)">ab</span> = <span style="color:var(--accent4)">10a + b</span></div>
+    <div class="formula">3-digit number <span style="color:var(--text)">abc</span> = <span style="color:var(--accent4)">100a + 10b + c</span></div>
+    <p style="margin-top:12px;">Here <span class="hl-b">a</span>, <span class="hl-b">b</span>, <span class="hl-b">c</span> are individual digits (0–9), and <span class="hl-b">a ≠ 0</span>.</p>
+  </div>
+
+  <div class="card yellow">
+    <h2>✏️ Examples</h2>
+    <div class="num-blocks">
+      <div class="num-block" style="color:var(--accent2)">73</div>
+      <div style="display:flex; align-items:center; color:var(--muted); font-size:1.5rem">=</div>
+      <div class="num-block" style="color:var(--accent1)">7×10</div>
+      <div style="display:flex; align-items:center; color:var(--muted); font-size:1.5rem">+</div>
+      <div class="num-block" style="color:var(--accent3)">3</div>
+    </div>
+    <div class="num-blocks" style="margin-top:8px">
+      <div class="num-block" style="color:var(--accent2)">486</div>
+      <div style="display:flex; align-items:center; color:var(--muted); font-size:1.5rem">=</div>
+      <div class="num-block" style="color:var(--accent1)">4×100</div>
+      <div style="display:flex; align-items:center; color:var(--muted); font-size:1.5rem">+</div>
+      <div class="num-block" style="color:var(--accent3)">8×10</div>
+      <div style="display:flex; align-items:center; color:var(--muted); font-size:1.5rem">+</div>
+      <div class="num-block" style="color:var(--accent5)">6</div>
+    </div>
+  </div>
+
+  <div class="card green">
+    <h2>⚡ Try It Yourself</h2>
+    <div class="demo-box">
+      <h3>Enter any 2 or 3 digit number</h3>
+      <div class="input-row">
+        <input type="number" id="genInput" placeholder="e.g. 57" min="10" max="999">
+        <button class="btn" onclick="showGenForm()">Expand!</button>
+      </div>
+      <div class="result-box" id="genResult"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ REVERSALS -->
+<div class="section" id="reversals">
+  <div class="section-heading">🔄 Reversal Magic</div>
+  <p class="section-sub">Flip a number's digits — and witness the hidden pattern!</p>
+
+  <div class="card red">
+    <h2>🎩 2-Digit Reversal</h2>
+    <p>Let a 2-digit number be <span class="hl-b">ab = 10a + b</span>. Its reverse is <span class="hl-b">ba = 10b + a</span>.</p>
+
+    <div class="formula" style="color: var(--accent3)">Sum = (10a+b) + (10b+a) = <strong>11(a+b)</strong> → Always divisible by 11! ✓</div>
+    <div class="formula" style="color: var(--accent1)">Difference = (10a+b) − (10b+a) = <strong>9(a−b)</strong> → Always divisible by 9! ✓</div>
+
+    <p style="margin-top:10px;">These results hold for <em>any</em> 2-digit number. That's the power of algebra!</p>
+  </div>
+
+  <div class="card purple">
+    <h2>🎩 3-Digit Reversal</h2>
+    <p>Let <span class="hl-b">abc = 100a + 10b + c</span>. Reversed: <span class="hl-b">cba = 100c + 10b + a</span>.</p>
+    <div class="formula">Difference = <strong>99(a − c)</strong> → Divisible by 9, 11, and 99!</div>
+    <p>Notice: the middle digit <span class="hl-p">b</span> cancels out completely!</p>
+  </div>
+
+  <div class="card green">
+    <h2>⚡ Reversal Calculator</h2>
+    <div class="demo-box">
+      <h3>Enter a 2 or 3 digit number to see the magic</h3>
+      <div class="input-row">
+        <input type="number" id="revInput" placeholder="e.g. 73" min="10" max="999">
+        <button class="btn" onclick="showReversal()">Reveal Pattern!</button>
+      </div>
+      <div class="result-box" id="revResult"></div>
+    </div>
+  </div>
+
+  <div class="card yellow">
+    <h2>🧩 The "Think of a Number" Trick</h2>
+    <p style="margin-bottom:10px;">Here's a party trick based on this concept:</p>
+    <ol style="padding-left:20px; color:var(--muted); display:flex; flex-direction:column; gap:8px;">
+      <li>Ask a friend to think of any 2-digit number</li>
+      <li>Reverse the digits and subtract the smaller from the larger</li>
+      <li>Tell them: <span class="hl-y">"Your answer is divisible by 9!"</span></li>
+    </ol>
+    <p style="margin-top:10px;">You'll <em>always</em> be right — because 9(a−b) is always a multiple of 9!</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ DIVISIBILITY -->
+<div class="section" id="divisibility">
+  <div class="section-heading">➗ Divisibility Rules</div>
+  <p class="section-sub">Test if a number divides evenly — without actually dividing!</p>
+
+  <div class="card blue">
+    <h2>📋 The Rules</h2>
+    <table class="div-table">
+      <tr><th>Divisor</th><th>Rule</th><th>Example</th></tr>
+      <tr><td><span class="hl-b">2</span></td><td>Last digit is 0,2,4,6 or 8 (even)</td><td>348 ✓ (ends in 8)</td></tr>
+      <tr><td><span class="hl-g">3</span></td><td>Sum of all digits divisible by 3</td><td>123 → 1+2+3=6 ✓</td></tr>
+      <tr><td><span class="hl-y">4</span></td><td>Last 2 digits form a number divisible by 4</td><td>1312 → 12÷4=3 ✓</td></tr>
+      <tr><td><span class="hl-r">5</span></td><td>Last digit is 0 or 5</td><td>415 ✓ (ends in 5)</td></tr>
+      <tr><td><span class="hl-p">6</span></td><td>Divisible by both 2 AND 3</td><td>132 ✓ (even, 1+3+2=6)</td></tr>
+      <tr><td><span class="hl-b">8</span></td><td>Last 3 digits divisible by 8</td><td>5128 → 128÷8=16 ✓</td></tr>
+      <tr><td><span class="hl-g">9</span></td><td>Sum of all digits divisible by 9</td><td>729 → 7+2+9=18 ✓</td></tr>
+      <tr><td><span class="hl-y">10</span></td><td>Last digit is 0</td><td>470 ✓ (ends in 0)</td></tr>
+      <tr><td><span class="hl-r">11</span></td><td>(Sum at odd positions) − (Sum at even positions) = 0 or multiple of 11</td><td>2728 → (2+2)−(7+8) = 4−15 = −11 ✓</td></tr>
+    </table>
+  </div>
+
+  <div class="card red">
+    <h2>🔍 Divisibility by 11 — Explained</h2>
+    <p>Number: <span class="hl-y">39468</span></p>
+    <div class="num-blocks" style="margin: 14px 0">
+      <div class="num-block" style="color:var(--accent3); border-color:var(--accent3)">3<br><small style="font-size:0.5rem">Pos 5 (odd)</small></div>
+      <div class="num-block" style="color:var(--accent1); border-color:var(--accent1)">9<br><small style="font-size:0.5rem">Pos 4 (even)</small></div>
+      <div class="num-block" style="color:var(--accent3); border-color:var(--accent3)">4<br><small style="font-size:0.5rem">Pos 3 (odd)</small></div>
+      <div class="num-block" style="color:var(--accent1); border-color:var(--accent1)">6<br><small style="font-size:0.5rem">Pos 2 (even)</small></div>
+      <div class="num-block" style="color:var(--accent3); border-color:var(--accent3)">8<br><small style="font-size:0.5rem">Pos 1 (odd)</small></div>
+    </div>
+    <div class="formula">Odd positions: 3 + 4 + 8 = <span style="color:var(--accent3)">15</span></div>
+    <div class="formula">Even positions: 9 + 6 = <span style="color:var(--accent1)">15</span></div>
+    <div class="formula">Difference = 15 − 15 = <span style="color:var(--accent2)">0</span> → Divisible by 11 ✓</div>
+  </div>
+
+  <div class="card green">
+    <h2>⚡ Divisibility Tester</h2>
+    <div class="demo-box">
+      <h3>Check any number (2–999999)</h3>
+      <div class="input-row">
+        <input type="number" id="divInput" placeholder="e.g. 432" min="2" max="999999">
+        <button class="btn" onclick="checkDivisibility()">Test All!</button>
+      </div>
+      <div class="result-box" id="divResult"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ CRYPTO -->
+<div class="section" id="crypto">
+  <div class="section-heading">🔐 Cryptarithmetic</div>
+  <p class="section-sub">Each letter hides a digit. Your job: decode the puzzle!</p>
+
+  <div class="card purple">
+    <h2>📖 The Rules</h2>
+    <ul style="padding-left:20px; display:flex; flex-direction:column; gap:8px; color:var(--muted)">
+      <li>Each letter represents a <span class="hl-p">unique digit</span> (0–9)</li>
+      <li>The <span class="hl-p">first digit of any number cannot be 0</span></li>
+      <li>Use trial-and-error + logic to narrow down possibilities</li>
+      <li>Always verify your answer by substituting back in</li>
+    </ul>
+  </div>
+
+  <div class="card red">
+    <h2>🧩 Solved Example</h2>
+    <div style="text-align:center; margin: 10px 0 6px">
+      <div class="puzzle-grid">
+        <div>&nbsp;A B</div>
+        <div>+&nbsp;B A</div>
+        <div class="puzzle-line">= 1 5 4</div>
+      </div>
+    </div>
+    <p style="margin-top: 12px"><span class="hl-y">Step 1:</span> AB = 10A+B, BA = 10B+A</p>
+    <p><span class="hl-y">Step 2:</span> Sum = 11A + 11B = 11(A+B) = 154</p>
+    <div class="formula">11(A+B) = 154 → A+B = 14</div>
+    <p><span class="hl-y">Step 3:</span> Possible pairs (A,B): (5,9), (6,8), (7,7), (8,6), (9,5)</p>
+    <p><span class="hl-y">Step 4:</span> Any pair works! e.g. <span class="hl-g">A=5, B=9</span> → 59+95=154 ✓</p>
+  </div>
+
+  <div class="card yellow">
+    <h2>🎮 Try This Puzzle</h2>
+    <p style="margin-bottom:16px; color:var(--muted)">Find the digit A in this addition puzzle:</p>
+    <div style="text-align:center">
+      <div class="puzzle-grid">
+        <div>&nbsp;&nbsp;3 <span style="color:var(--accent2)">A</span></div>
+        <div>+ <span style="color:var(--accent2)">A</span> 5</div>
+        <div class="puzzle-line">&nbsp;</div>
+      </div>
+    </div>
+    <p style="margin-top:12px; color:var(--muted)">What must A be so the addition works with a valid carry? Try A = 7:</p>
+    <div class="formula">Units: 7+5 = 12 → write 2, carry 1 &nbsp;|&nbsp; Tens: 3+7+1 = 11 → write 1, carry 1</div>
+    <div class="formula">So 37 + 75 = <span style="color:var(--accent3)">112</span> ✓ (A = 7)</div>
+  </div>
+
+  <div class="card green">
+    <h2>⚡ Puzzle Solver Helper</h2>
+    <div class="demo-box">
+      <h3>Find A in: 3A + A5 = ?</h3>
+      <p style="color:var(--muted); font-size:0.9rem; text-align:center; margin-bottom:12px">Type a value for A (0–9) and see if the math works</p>
+      <div class="input-row">
+        <input type="number" id="cryptoA" placeholder="A = ?" min="0" max="9">
+        <button class="btn" onclick="solveCrypto()">Check!</button>
+      </div>
+      <div class="result-box" id="cryptoResult"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ QUIZ -->
+<div class="section" id="quiz">
+  <div class="section-heading">🎯 Mini Quiz</div>
+  <p class="section-sub">Test what you've learned — 8 questions!</p>
+
+  <div class="score-display" id="scoreDisplay">Score: 0 / 0</div>
+  <div class="progress-wrap"><div class="progress-fill" id="progressBar" style="width:0%"></div></div>
+
+  <div class="card" id="quizCard" style="border-color: rgba(255,255,255,0.1)">
+    <div class="quiz-q" id="quizQuestion">Loading question...</div>
+    <div class="quiz-options" id="quizOptions"></div>
+    <div class="quiz-feedback" id="quizFeedback"></div>
+    <button class="btn" id="nextBtn" onclick="nextQuestion()" style="display:none">Next Question →</button>
+    <div id="quizFinish" style="display:none; text-align:center">
+      <div style="font-family:'Fredoka One', cursive; font-size:2rem; color:var(--accent2); margin-bottom:12px" id="finalScore"></div>
+      <p style="color:var(--muted); margin-bottom:16px" id="finalMsg"></p>
+      <button class="btn" onclick="restartQuiz()">Try Again 🔄</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ──────── GENERAL FORM ────────
+function showGenForm() {
+  const n = parseInt(document.getElementById('genInput').value);
+  const res = document.getElementById('genResult');
+  if (!n || n < 10 || n > 999) {
+    res.innerHTML = '⚠️ Please enter a number between 10 and 999';
+    res.className = 'result-box show';
+    return;
+  }
+  const s = String(n);
+  let html = '';
+  if (s.length === 2) {
+    const a = s[0], b = s[1];
+    html = `<strong>${n}</strong> is a <span style="color:var(--accent4)">2-digit number</span> (<b>${a}${b}</b>)<br><br>
+    General Form: <span style="color:var(--accent2)">10×${a} + ${b} = ${10*a} + ${b} = ${n}</span><br><br>
+    Here <b>a = ${a}</b> (tens digit) and <b>b = ${b}</b> (units digit)`;
+  } else {
+    const a = s[0], b = s[1], c = s[2];
+    html = `<strong>${n}</strong> is a <span style="color:var(--accent4)">3-digit number</span> (<b>${a}${b}${c}</b>)<br><br>
+    General Form: <span style="color:var(--accent2)">100×${a} + 10×${b} + ${c} = ${100*a} + ${10*b} + ${c} = ${n}</span><br><br>
+    Here <b>a = ${a}</b>, <b>b = ${b}</b>, <b>c = ${c}</b>`;
+  }
+  res.innerHTML = html;
+  res.className = 'result-box show';
+}
+
+// ──────── REVERSALS ────────
+function showReversal() {
+  const n = parseInt(document.getElementById('revInput').value);
+  const res = document.getElementById('revResult');
+  if (!n || n < 10 || n > 999) {
+    res.innerHTML = '⚠️ Enter a 2 or 3 digit number';
+    res.className = 'result-box show';
+    return;
+  }
+  const s = String(n);
+  const rev = parseInt(s.split('').reverse().join(''));
+  if (s.length === 2) {
+    const a = parseInt(s[0]), b = parseInt(s[1]);
+    const sum = n + rev, diff = Math.abs(n - rev);
+    res.innerHTML = `
+      Number: <strong>${n}</strong> &nbsp;|&nbsp; Reversed: <strong>${rev}</strong><br><br>
+      <span style="color:var(--accent3)">Sum = ${n} + ${rev} = <strong>${sum}</strong> = 11 × ${a+b} &nbsp;(Divisible by 11 ✓)</span><br>
+      <span style="color:var(--accent1)">Diff = |${n} − ${rev}| = <strong>${diff}</strong> = 9 × ${Math.abs(a-b)} &nbsp;(Divisible by 9 ✓)</span>`;
+  } else {
+    const a = parseInt(s[0]), c = parseInt(s[2]);
+    const diff = Math.abs(n - rev);
+    res.innerHTML = `
+      Number: <strong>${n}</strong> &nbsp;|&nbsp; Reversed: <strong>${rev}</strong><br><br>
+      <span style="color:var(--accent1)">Diff = |${n} − ${rev}| = <strong>${diff}</strong> = 99 × ${Math.abs(a-c)}</span><br>
+      <span style="color:var(--accent3)">Divisible by 9 ✓ &nbsp; Divisible by 11 ✓ &nbsp; Divisible by 99 ✓</span><br>
+      <span style="color:var(--muted)">Note: Middle digit (${s[1]}) cancels out!</span>`;
+  }
+  res.className = 'result-box show';
+}
+
+// ──────── DIVISIBILITY ────────
+function checkDivisibility() {
+  const n = parseInt(document.getElementById('divInput').value);
+  const res = document.getElementById('divResult');
+  if (!n || n < 2) { res.innerHTML = '⚠️ Enter a number ≥ 2'; res.className='result-box show'; return; }
+  const divisors = [2,3,4,5,6,8,9,10,11];
+  let lines = [`Checking <strong>${n}</strong>:<br><br>`];
+  for (const d of divisors) {
+    const ok = n % d === 0;
+    lines.push(`<span style="color:${ok ? 'var(--accent3)' : 'var(--muted)'}">${ok ? '✅' : '❌'} Divisible by ${d}: ${ok ? 'YES' : 'NO'}</span>`);
+  }
+  res.innerHTML = lines.join('<br>');
+  res.className = 'result-box show';
+}
+
+// ──────── CRYPTARITHMETIC ────────
+function solveCrypto() {
+  const A = parseInt(document.getElementById('cryptoA').value);
+  const res = document.getElementById('cryptoResult');
+  if (isNaN(A) || A < 0 || A > 9) { res.innerHTML = '⚠️ Enter a digit 0–9'; res.className='result-box show'; return; }
+  const num1 = 30 + A;
+  const num2 = A * 10 + 5;
+  const total = num1 + num2;
+  const ok = (A === 7); // 37+75=112
+  res.innerHTML = `
+    A = <strong>${A}</strong><br><br>
+    3A = <strong>${num1}</strong> &nbsp; A5 = <strong>${num2}</strong><br>
+    Sum = ${num1} + ${num2} = <strong>${total}</strong><br><br>
+    ${ok
+      ? `<span style="color:var(--accent3)">✅ A = 7 is the correct answer! 37 + 75 = 112</span>`
+      : `<span style="color:var(--accent1)">❌ A = ${A} gives ${total}. Try A = 7!</span>`}`;
+  res.className = 'result-box show';
+}
+
+// ──────── QUIZ ────────
+const questions = [
+  { q: "What is the general form of a 2-digit number 'ab'?", opts: ["a + b", "10a + b", "10b + a", "100a + b"], ans: 1, exp: "A 2-digit number ab = 10a + b (a is the tens digit, b is units digit)" },
+  { q: "If you reverse a 2-digit number and add it to the original, the result is always divisible by:", opts: ["9", "11", "99", "3"], ans: 1, exp: "(10a+b) + (10b+a) = 11(a+b), which is divisible by 11" },
+  { q: "If you reverse a 2-digit number and find the difference, it is always divisible by:", opts: ["11", "99", "9", "3"], ans: 2, exp: "(10a+b) − (10b+a) = 9(a−b), divisible by 9" },
+  { q: "Which divisibility rule tells us 432 is divisible by 3?", opts: ["Last digit is even", "Sum of digits (4+3+2=9) divisible by 3", "Last two digits divisible by 3", "First digit divisible by 3"], ans: 1, exp: "4+3+2 = 9, and 9÷3 = 3, so 432 is divisible by 3" },
+  { q: "Is 5765 divisible by 11? (Odd positions from right: 5,7 — Even: 6,5)", opts: ["Yes, difference is 11", "Yes, difference is 0", "No, difference is 1", "No, difference is 3"], ans: 2, exp: "Odd pos (5+7=12), Even pos (6+5=11). Diff = 1. So 5765 is NOT divisible by 11." },
+  { q: "In cryptarithmetic, what is the rule about the first digit of a number?", opts: ["It must be odd", "It can be any digit 0–9", "It cannot be 0", "It must be the same for all numbers"], ans: 2, exp: "The first (leftmost) digit of any number in a puzzle cannot be 0" },
+  { q: "What is the general form of a 3-digit number 'abc'?", opts: ["100a + 10b + c", "10a + 10b + c", "100a + b + c", "a + b + c"], ans: 0, exp: "abc = 100a + 10b + c (hundreds + tens + units)" },
+  { q: "When you reverse a 3-digit number abc, the difference abc − cba always equals:", opts: ["9(a−c)", "11(a−c)", "99(a−b)", "99(a−c)"], ans: 3, exp: "(100a+10b+c) − (100c+10b+a) = 99a − 99c = 99(a−c). The middle digit b cancels!" }
+];
+
+let current = 0, score = 0, answered = false;
+
+function loadQuestion() {
+  if (current >= questions.length) { showFinish(); return; }
+  const q = questions[current];
+  document.getElementById('quizQuestion').textContent = `Q${current+1}. ${q.q}`;
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = o;
+    btn.onclick = () => selectAnswer(i);
+    opts.appendChild(btn);
+  });
+  document.getElementById('quizFeedback').className = 'quiz-feedback';
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('progressBar').style.width = `${(current/questions.length)*100}%`;
+  answered = false;
+  updateScore();
+}
+
+function selectAnswer(i) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const opts = document.querySelectorAll('.quiz-opt');
+  const fb = document.getElementById('quizFeedback');
+  opts[q.ans].classList.add('correct');
+  if (i === q.ans) {
+    score++;
+    fb.className = 'quiz-feedback show-correct';
+    fb.textContent = '✅ Correct! ' + q.exp;
+  } else {
+    opts[i].classList.add('wrong');
+    fb.className = 'quiz-feedback show-wrong';
+    fb.textContent = '❌ Not quite. ' + q.exp;
+  }
+  updateScore();
+  document.getElementById('nextBtn').style.display = 'inline-block';
+}
+
+function nextQuestion() {
+  current++;
+  loadQuestion();
+}
+
+function updateScore() {
+  document.getElementById('scoreDisplay').textContent = `Score: ${score} / ${Math.min(current + (answered ? 1 : 0), questions.length)}`;
+}
+
+function showFinish() {
+  document.getElementById('quizQuestion').style.display = 'none';
+  document.getElementById('quizOptions').style.display = 'none';
+  document.getElementById('quizFeedback').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('progressBar').style.width = '100%';
+  const pct = Math.round((score / questions.length) * 100);
+  const fin = document.getElementById('quizFinish');
+  fin.style.display = 'block';
+  document.getElementById('finalScore').textContent = `${score} / ${questions.length} (${pct}%)`;
+  const msgs = ['Keep practicing! Review the sections again. 📚', 'Good effort! A bit more practice will do it! 💪', 'Well done! You understand the key concepts! 🌟', 'Excellent! You\'ve mastered Playing with Numbers! 🏆'];
+  document.getElementById('finalMsg').textContent = msgs[pct < 50 ? 0 : pct < 70 ? 1 : pct < 90 ? 2 : 3];
+}
+
+function restartQuiz() {
+  current = 0; score = 0; answered = false;
+  document.getElementById('quizQuestion').style.display = 'block';
+  document.getElementById('quizOptions').style.display = 'grid';
+  document.getElementById('quizFinish').style.display = 'none';
+  loadQuestion();
+}
+
+// ──────── NAV ────────
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const btns = document.querySelectorAll('.nav-btn');
+  const ids = ['intro','general','reversals','divisibility','crypto','quiz'];
+  btns[ids.indexOf(id)].classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Init quiz
+loadQuestion();
+</script>
+</body>
+</html>
